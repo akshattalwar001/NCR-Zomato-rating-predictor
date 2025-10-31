@@ -194,7 +194,7 @@ if st.button("Predict Rating", type="primary", use_container_width=True):
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: gray;'>
-    <small>Powered by XGBoost Machine Learning Model<br>
-    Predictions based on Delhi NCR restaurant data</small>
+    <small>Contributors : Akshat Talwar & Waqar Akhtar<br>
+    Predictions based on Zomato Restaurants in Delhi NCR data</small>
 </div>
 """, unsafe_allow_html=True)
