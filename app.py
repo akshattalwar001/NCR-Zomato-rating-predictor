@@ -63,7 +63,7 @@ CUISINE_TO_CODE = {v: k for k, v in CUISINE_MAPPING.items()}
 @st.cache_resource
 def load_model():
     try:
-        with open('restaurant_rating_model.pkl', 'rb') as f:
+        with open('restaurant-rating-api/restaurant_rating_model.pkl', 'rb') as f:
             model = pickle.load(f)
         return model
     except FileNotFoundError:

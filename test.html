@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Rating Predictor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: #f7f2e8;
+            min-height: 100vh;
+            padding: 40px 20px;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0%, rgba(248, 242, 230, 0.8) 90%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4c4a8' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .menu-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fffdf5;
+            border-radius: 12px;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.08),
+                0 6px 15px rgba(0,0,0,0.05),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+            padding: 50px 60px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e8dfce;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #c9a86a, #d4b77d, #e6cfa5, #d4b77d, #c9a86a);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .menu-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23c9a86a' fill-opacity='0.1' d='M50,0 C77.614,0 100,22.386 100,50 C100,77.614 77.614,100 50,100 C22.386,100 0,77.614 0,50 C0,22.386 22.386,0 50,0 Z M50,10 C27.909,10 10,27.909 10,50 C10,72.091 27.909,90 50,90 C72.091,90 90,72.091 90,50 C90,27.909 72.091,10 50,10 Z'%3E%3C/path%3E%3C/svg%3E") no-repeat;
+            transform: translate(30px, -30px);
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 25px;
+        }
+
+        .menu-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            right: 25%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #c9a86a, transparent);
+        }
+
+        h1 {
+            color: #5a3921;
+            font-size: 2.8em;
+            font-weight: normal;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #8c6d46;
+            font-size: 1.1em;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-section {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            color: #5a3921;
+            font-size: 1.4em;
+            font-weight: normal;
+        }
+
+        .section-title i {
+            margin-right: 12px;
+            color: #c9a86a;
+            font-size: 1.2em;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, #c9a86a, transparent);
+            margin-left: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #5a3921;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8c6d46;
+            font-size: 1.1em;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #d4c4a8;
+            background: #fffdf5;
+            font-family: 'Georgia', serif;
+            font-size: 15px;
+            color: #5a3921;
+            transition: all 0.3s;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #c9a86a;
+            box-shadow: 0 0 0 2px rgba(201, 168, 106, 0.2);
+            background: #fff;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: transparent;
+            margin-top: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 6px;
+            background: #e8dfce;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            background: #c9a86a;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 2px solid #fff;
+        }
+
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            background: #e8dfce;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            background: #c9a86a;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 12px;
+            color: #5a3921;
+            font-weight: bold;
+            font-size: 1.2em;
+            background: #f7f2e8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            min-width: 40px;
+        }
+
+        .checkbox-group {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            background: #f7f2e8;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            background: #f0e9d9;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #c9a86a;
+        }
+
+        .checkbox-item label {
+            display: inline;
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px dashed #d4c4a8;
+            margin: 30px 0;
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #c9a86a, #b89450);
+            color: #fff;
+            border: none;
+            font-family: 'Georgia', serif;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(201, 168, 106, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predict-btn:hover {
+            background: linear-gradient(135deg, #b89450, #a88240);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(201, 168, 106, 0.4);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(201, 168, 106, 0.3);
+        }
+
+        .predict-btn:disabled {
+            background: #d4c4a8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .predict-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .predict-btn:hover::after {
+            left: 100%;
+        }
+
+        .result-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f7f2e8;
+            border-radius: 8px;
+            border: 1px solid #e8dfce;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #c9a86a, #d4b77d, #e6cfa5, #d4b77d, #c9a86a);
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .rating-display {
+            text-align: center;
+            font-size: 72px;
+            color: #5a3921;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stars {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 24px;
+            color: #ffc107;
+        }
+
+        .rating-category {
+            background: rgba(201, 168, 106, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #c9a86a;
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
+            color: #5a3921;
+            text-align: center;
+        }
+
+        .details {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #e8dfce;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .details.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .details-toggle {
+            background: none;
+            border: none;
+            color: #8c6d46;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            font-size: 15px;
+            text-decoration: underline;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            margin: 15px auto 0;
+            transition: color 0.3s;
+        }
+
+        .details-toggle:hover {
+            color: #5a3921;
+        }
+
+        .details-toggle i {
+            margin-left: 8px;
+            transition: transform 0.3s;
+        }
+
+        .details-toggle.active i {
+            transform: rotate(180deg);
+        }
+
+        .details h3 {
+            margin-bottom: 15px;
+            color: #5a3921;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #e8dfce;
+            padding-bottom: 8px;
+        }
+
+        .details p {
+            margin: 12px 0;
+            color: #5a3921;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed #d4c4a8;
+            color: #8c6d46;
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        .error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            border-radius: 6px;
+            display: none;
+            font-weight: bold;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .rating-display {
+                font-size: 56px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-card">
+        <div class="menu-header">
+            <h1>Restaurant Rating</h1>
+            <p class="subtitle">prediction system for delhi ncr</p>
+        </div>
+
+        <div class="menu-section">
+            <h2 class="section-title"><i class="fas fa-utensils"></i> Restaurant Details</h2>
+
+            <div class="error" id="error"></div>
+
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="pricing">Price for 2 people (₹)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-rupee-sign"></i>
+                                <input type="number" id="pricing" min="100" max="10000" step="50" value="1000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="locality">Locality</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <select id="locality" required>
+                                    <option value=" Baani Square, Sector 50, Gurgaon">Baani Square, Sector 50, Gurgaon</option>
+                                    <option value=" Chanakyapuri, New Delhi">Chanakyapuri, New Delhi</option>
+                                    <option value=" Connaught Place, New Delhi">Connaught Place, New Delhi</option>
+                                    <option value=" Cyber Hub, DLF Cyber City, Gurgaon">Cyber Hub, DLF Cyber City, Gurgaon</option>
+                                    <option value=" Delhi University-GTB Nagar, New Delhi">Delhi University-GTB Nagar, New Delhi</option>
+                                    <option value=" Greater Kailash 2 (GK2), New Delhi">Greater Kailash 2 (GK2), New Delhi</option>
+                                    <option value=" Hauz Khas, New Delhi">Hauz Khas, New Delhi</option>
+                                    <option value=" Indirapuram, Ghaziabad">Indirapuram, Ghaziabad</option>
+                                    <option value=" Janakpuri, New Delhi">Janakpuri, New Delhi</option>
+                                    <option value=" Karkardooma, New Delhi">Karkardooma, New Delhi</option>
+                                    <option value=" Karol Bagh, New Delhi">Karol Bagh, New Delhi</option>
+                                    <option value=" Khan Market, New Delhi">Khan Market, New Delhi</option>
+                                    <option value=" Malviya Nagar, New Delhi">Malviya Nagar, New Delhi</option>
+                                    <option value=" NIT, Faridabad">NIT, Faridabad</option>
+                                    <option value=" Paschim Vihar, New Delhi">Paschim Vihar, New Delhi</option>
+                                    <option value=" Pitampura, New Delhi">Pitampura, New Delhi</option>
+                                    <option value=" Punjabi Bagh, New Delhi">Punjabi Bagh, New Delhi</option>
+                                    <option value=" Raj Nagar, Ghaziabad">Raj Nagar, Ghaziabad</option>
+                                    <option value=" Rajouri Garden, New Delhi">Rajouri Garden, New Delhi</option>
+                                    <option value=" Rohini, New Delhi">Rohini, New Delhi</option>
+                                    <option value=" Safdarjung, New Delhi">Safdarjung, New Delhi</option>
+                                    <option value=" Sector 18, Noida">Sector 18, Noida</option>
+                                    <option value=" Sector 29, Gurgaon">Sector 29, Gurgaon</option>
+                                    <option value=" Sector 72, Noida">Sector 72, Noida</option>
+                                    <option value=" Vijay Nagar, New Delhi">Vijay Nagar, New Delhi</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="main_cuisine">Main Cuisine</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-globe-asia"></i>
+                                <select id="main_cuisine" required>
+                                    <option value="Asian">Asian</option>
+                                    <option value="Bakery">Bakery</option>
+                                    <option value="Burger">Burger</option>
+                                    <option value="Cafe">Cafe</option>
+                                    <option value="Chinese">Chinese</option>
+                                    <option value="Continental">Continental</option>
+                                    <option value="Desserts">Desserts</option>
+                                    <option value="Fast Food">Fast Food</option>
+                                    <option value="Finger Food">Finger Food</option>
+                                    <option value="Italian">Italian</option>
+                                    <option value="Mughlai">Mughlai</option>
+                                    <option value="North Indian" selected>North Indian</option>
+                                    <option value="Other">Other</option>
+                                    <option value="Pizza">Pizza</option>
+                                    <option value="South Indian">South Indian</option>
+                                    <option value="Street Food">Street Food</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label for="cuisine_count">Number of Cuisines Offered</label>
+                            <input type="range" id="cuisine_count" min="1" max="10" value="3">
+                            <div class="slider-value" id="cuisine_count_value">3</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="delivery_count">Delivery Rating Count</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-truck"></i>
+                                <input type="number" id="delivery_count" min="0" max="10000" step="50" value="100" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cuisine Type Flags</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="is_north_indian" checked>
+                                    <label for="is_north_indian">Serves North Indian</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="is_chinese">
+                                    <label for="is_chinese">Serves Chinese</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="is_fast_food">
+                                    <label for="is_fast_food">Is Fast Food</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <button type="submit" class="predict-btn">Predict Rating</button>
+            </form>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <h2 class="section-title"><i class="fas fa-star"></i> Predicted Rating</h2>
+            <div class="rating-display" id="ratingDisplay">4.20</div>
+            <div class="stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+            </div>
+            <div class="rating-category" id="ratingCategory"></div>
+
+            <button class="details-toggle" id="detailsToggle" onclick="toggleDetails()">
+                view prediction details <i class="fas fa-chevron-down"></i>
+            </button>
+
+            <div class="details" id="detailsSection">
+                <h3>Input Summary</h3>
+                <div id="inputSummary"></div>
+
+                <h3 style="margin-top: 20px;">Encoded Values</h3>
+                <div id="encodedValues"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Contributors: Waqar Akhtar & Akshat Talwar<br>
+            Predictions based on Zomato delhi ncr restaurant data
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        const cuisineSlider = document.getElementById('cuisine_count');
+        const cuisineValue = document.getElementById('cuisine_count_value');
+
+        cuisineSlider.addEventListener('input', function() {
+            cuisineValue.textContent = this.value;
+        });
+
+        const mainCuisineSelect = document.getElementById('main_cuisine');
+        mainCuisineSelect.addEventListener('change', function() {
+            const northIndianCheckbox = document.getElementById('is_north_indian');
+            const chineseCheckbox = document.getElementById('is_chinese');
+            const fastFoodCheckbox = document.getElementById('is_fast_food');
+
+            northIndianCheckbox.checked = this.value === 'North Indian';
+            chineseCheckbox.checked = this.value === 'Chinese';
+            fastFoodCheckbox.checked = this.value === 'Fast Food';
+        });
+
+        function toggleDetails() {
+            const details = document.getElementById('detailsSection');
+            const toggleBtn = document.getElementById('detailsToggle');
+            details.classList.toggle('show');
+            toggleBtn.classList.toggle('active');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function updateStars(rating) {
+            const starsContainer = document.querySelector('.stars');
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating - fullStars >= 0.5;
+
+            let starsHTML = '';
+
+            // Add full stars
+            for (let i = 0; i < fullStars; i++) {
+                starsHTML += '<i class="fas fa-star"></i>';
+            }
+
+            // Add half star if needed
+            if (hasHalfStar) {
+                starsHTML += '<i class="fas fa-star-half-alt"></i>';
+            }
+
+            // Add empty stars
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                starsHTML += '<i class="far fa-star"></i>';
+            }
+
+            starsContainer.innerHTML = starsHTML;
+        }
+
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = e.target.querySelector('.predict-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'predicting...';
+
+            const formData = {
+                pricing: parseInt(document.getElementById('pricing').value),
+                locality: document.getElementById('locality').value,
+                main_cuisine: document.getElementById('main_cuisine').value,
+                cuisine_count: parseInt(document.getElementById('cuisine_count').value),
+                delivery_count: parseInt(document.getElementById('delivery_count').value),
+                is_north_indian: document.getElementById('is_north_indian').checked,
+                is_chinese: document.getElementById('is_chinese').checked,
+                is_fast_food: document.getElementById('is_fast_food').checked
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('prediction failed. make sure api is running at http://localhost:8000');
+                }
+
+                const result = await response.json();
+
+                const rating = result.predicted_rating.toFixed(2);
+                document.getElementById('ratingDisplay').textContent = rating;
+                updateStars(parseFloat(rating));
+
+                let categoryText = '';
+                if (result.predicted_rating >= 4.5) {
+                    categoryText = 'excellent - this restaurant is predicted to have outstanding ratings';
+                } else if (result.predicted_rating >= 4.3) {
+                    categoryText = 'very good - customers are likely to be very satisfied';
+                } else if (result.predicted_rating >= 4.1) {
+                    categoryText = 'good - above average restaurant with solid ratings';
+                } else {
+                    categoryText = 'average - room for improvement in customer satisfaction';
+                }
+                document.getElementById('ratingCategory').textContent = categoryText;
+
+                const summary = result.input_summary;
+                document.getElementById('inputSummary').innerHTML = `
+                    <p>price category: ${summary.price_category} (₹${summary.pricing})</p>
+                    <p>location: ${summary.locality}</p>
+                    <p>main cuisine: ${summary.main_cuisine}</p>
+                    <p>cuisines offered: ${summary.cuisine_count}</p>
+                    <p>delivery orders: ${summary.delivery_count}</p>
+                    <p>high delivery volume: ${summary.high_delivery_volume ? 'yes' : 'no'}</p>
+                `;
+
+                const localityMapping = {' Baani Square, Sector 50, Gurgaon': 0, ' Chanakyapuri, New Delhi': 1, ' Connaught Place, New Delhi': 2, ' Cyber Hub, DLF Cyber City, Gurgaon': 3, ' Delhi University-GTB Nagar, New Delhi': 4, ' Greater Kailash 2 (GK2), New Delhi': 5, ' Hauz Khas, New Delhi': 6, ' Indirapuram, Ghaziabad': 7, ' Janakpuri, New Delhi': 8, ' Karkardooma, New Delhi': 9, ' Karol Bagh, New Delhi': 10, ' Khan Market, New Delhi': 11, ' Malviya Nagar, New Delhi': 12, ' NIT, Faridabad': 13, ' Paschim Vihar, New Delhi': 14, ' Pitampura, New Delhi': 15, ' Punjabi Bagh, New Delhi': 16, ' Raj Nagar, Ghaziabad': 17, ' Rajouri Garden, New Delhi': 18, ' Rohini, New Delhi': 19, ' Safdarjung, New Delhi': 20, ' Sector 18, Noida': 21, ' Sector 29, Gurgaon': 22, ' Sector 72, Noida': 23, ' Vijay Nagar, New Delhi': 24, 'Other': 25};
+                const cuisineMapping = {'Asian': 0, 'Bakery': 1, 'Burger': 2, 'Cafe': 3, 'Chinese': 4, 'Continental': 5, 'Desserts': 6, 'Fast Food': 7, 'Finger Food': 8, 'Italian': 9, 'Mughlai': 10, 'North Indian': 11, 'Other': 12, 'Pizza': 13, 'South Indian': 14, 'Street Food': 15};
+
+                const localityCode = localityMapping[formData.locality];
+                const cuisineCode = cuisineMapping[formData.main_cuisine];
+                const priceCatCode = formData.pricing <= 750 ? 0 : formData.pricing <= 1750 ? 1 : 2;
+
+                document.getElementById('encodedValues').innerHTML = `
+                    <p>locality code: ${localityCode}</p>
+                    <p>cuisine code: ${cuisineCode}</p>
+                    <p>price category code: ${priceCatCode}</p>
+                `;
+
+                document.getElementById('resultSection').classList.add('show');
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'predict rating';
+            }
+        });
+    </script>
+</body>
+</html>
